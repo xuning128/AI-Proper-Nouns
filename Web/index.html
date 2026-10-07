@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>術語秒懂｜AI 專有名詞解釋器</title>
+  <meta name="description" content="輸入任何專有名詞，幾秒內得到 AI 產生的白話說明。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 背景：方格線＋主標題光暈 -->
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <!-- ===== Header ===== -->
+  <header class="header" id="header">
+    <div class="header__inner">
+      <a class="logo" href="#" aria-label="術語秒懂 首頁">
+        <span class="logo__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2"/><path d="M12 5v14"/><path d="M9 19h6"/></svg>
+        </span>
+        <span class="logo__name">術語秒懂</span>
+      </a>
+      <div class="header__actions">
+        <span class="key-status" id="keyStatus" data-state="unset">
+          <span class="key-status__dot" aria-hidden="true"></span>
+          <span class="key-status__text" id="keyStatusText">未設定 API Key</span>
+        </span>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切換亮色／暗色模式">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <h1 class="hero__title">看不懂的名詞，交給 AI 解釋</h1>
+      <p class="hero__subtitle">輸入任何專有名詞，幾秒內得到白話說明</p>
+    </section>
+
+    <!-- ===== 主要區：輸入卡片＋結果卡片 ===== -->
+    <section class="workspace">
+      <!-- 輸入卡片 -->
+      <div class="card card--input">
+        <!-- AI 服務切換 -->
+        <div class="field">
+          <span class="mono-label" id="providerLabel">AI SERVICE</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="providerLabel">
+            <button class="segmented__item" type="button" role="radio" data-provider="gemini" aria-checked="true">
+              Gemini <span class="segmented__tag">免費</span>
+            </button>
+            <button class="segmented__item" type="button" role="radio" data-provider="openai" aria-checked="false">
+              OpenAI <span class="segmented__tag segmented__tag--muted">需儲值</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- API Key 欄位 -->
+        <div class="field">
+          <div class="field__label-row">
+            <label class="mono-label" for="apiKey" id="keyLabel">GEMINI API KEY</label>
+            <button class="link-btn" id="openGuide" type="button" aria-haspopup="dialog">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+              找不到 Key？
+            </button>
+          </div>
+          <div class="key-input" id="keyInputWrap" data-state="default">
+            <input class="key-input__control" id="apiKey" type="password" placeholder="AQ. 或 AIza 開頭" autocomplete="off" spellcheck="false" aria-describedby="keyHelp keyError" />
+            <button class="icon-btn icon-btn--sm" id="toggleKey" type="button" aria-label="顯示 API Key" aria-pressed="false">
+              <svg class="icon-eye" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 5.1-5.9M9.9 5.2A9.6 9.6 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/></svg>
+            </button>
+            <button class="text-btn" id="saveKey" type="button">儲存</button>
+            <span class="key-input__saved" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              已儲存
+            </span>
+          </div>
+          <p class="caption field__help" id="keyHelp">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            Key 只保存在這個瀏覽器分頁，關閉後自動清除，不會上傳到任何地方。
+          </p>
+          <p class="field__error" id="keyError" role="alert" hidden></p>
+        </div>
+
+        <div class="divider" aria-hidden="true"></div>
+
+        <!-- 名詞輸入 -->
+        <form class="field" id="termForm" novalidate>
+          <label class="mono-label" for="termInput">TERM</label>
+          <div class="term-row">
+            <input class="term-input" id="termInput" type="text" placeholder="例如：區塊鏈、機器學習、通膨" maxlength="100" autocomplete="off" enterkeyhint="search" />
+            <button class="btn-primary" id="explainBtn" type="submit" disabled>
+              <span class="spinner" aria-hidden="true"></span>
+              <span class="btn-primary__text">解釋</span>
+            </button>
+          </div>
+          <p class="field__error" id="termError" role="alert" hidden></p>
+        </form>
+
+        <!-- 範例膠囊 -->
+        <div class="examples">
+          <span class="caption examples__label">試試看：</span>
+          <div class="examples__list" role="list">
+            <button class="pill" type="button" role="listitem" data-term="機器學習">機器學習</button>
+            <button class="pill" type="button" role="listitem" data-term="API">API</button>
+            <button class="pill" type="button" role="listitem" data-term="碳足跡">碳足跡</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 結果卡片 -->
+      <div class="card card--result" id="resultCard" data-state="empty" aria-live="polite" aria-busy="false">
+        <!-- Empty -->
+        <div class="result result--empty">
+          <div class="result__empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 10.7l-6.1 1.9L12 18.5l-1.9-5.9L4 10.7l6.1-1.9z"/><path d="M19 3v4M17 5h4"/></svg>
+          </div>
+          <p class="result__empty-text">輸入名詞並按下「解釋」，結果會顯示在這裡。</p>
+        </div>
+
+        <!-- Loading -->
+        <div class="result result--loading">
+          <div class="result__head result__head--ghost">
+            <span class="mono-label">GENERATING</span>
+          </div>
+          <div class="skeleton" aria-hidden="true">
+            <span class="skeleton__bar" style="width: 92%"></span>
+            <span class="skeleton__bar" style="width: 100%"></span>
+            <span class="skeleton__bar" style="width: 86%"></span>
+            <span class="skeleton__bar" style="width: 60%"></span>
+          </div>
+          <span class="visually-hidden">解釋中，請稍候</span>
+          <p class="caption result__slow" id="slowHint" hidden>還在處理中，AI 回應有時需要 10–20 秒，請再稍等一下…</p>
+        </div>
+
+        <!-- Success -->
+        <div class="result result--success">
+          <div class="result__head">
+            <h2 class="result__term" id="resultTerm"></h2>
+            <button class="icon-btn" id="copyBtn" type="button" aria-label="複製解釋">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+            </button>
+          </div>
+          <p class="result__body" id="resultBody"></p>
+          <p class="result__meta caption">
+            <span class="mono" id="resultModel"></span>
+            <span aria-hidden="true">・</span>
+            <span class="mono" id="resultTime"></span>
+            <span class="result__meta-note">由 AI 產生，內容僅供參考</span>
+          </p>
+        </div>
+
+        <!-- Error -->
+        <div class="result result--error">
+          <div class="result__error-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          </div>
+          <p class="result__error-title">無法完成查詢</p>
+          <p class="result__error-text" id="errorText"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <p class="caption">© 2026 術語秒懂・課程作業｜API Key 不會離開你的瀏覽器</p>
+  </footer>
+
+  <!-- ===== 教學彈窗 ===== -->
+  <div class="modal" id="guideModal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="guideTitle" tabindex="-1">
+      <div class="modal__head">
+        <div>
+          <p class="mono-label" id="guideCounter">STEP 1 / 6</p>
+          <h2 class="modal__title" id="guideTitle"></h2>
+        </div>
+        <button class="close-btn" type="button" data-close aria-label="關閉教學">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <span>關閉</span>
+        </button>
+      </div>
+
+      <div class="progress" id="guideProgress" aria-hidden="true"></div>
+
+      <div class="modal__body" id="guideBody">
+        <div class="guide-slide" id="guideSlide">
+          <figure class="guide-figure">
+            <div class="guide-figure__img" id="guideFigure"></div>
+            <figcaption class="caption" id="guideNote">介面以官網為準</figcaption>
+          </figure>
+          <p class="guide-text" id="guideText"></p>
+          <a class="btn-outline" id="guideLink" href="#" target="_blank" rel="noopener noreferrer">開啟頁面 ↗</a>
+        </div>
+      </div>
+
+      <div class="modal__foot">
+        <button class="btn-outline" id="guidePrev" type="button">上一步</button>
+        <button class="btn-primary btn-primary--nav" id="guideNext" type="button">
+          <span class="btn-primary__text">下一步</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toast ===== -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <span class="toast__text" id="toastText"></span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
